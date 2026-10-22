@@ -144,6 +144,26 @@ function fetch_all(PDO $pdo, string $sql, array $params = []): array
     return $stmt->fetchAll();
 }
 
+function format_cpf(?string $cpf): string
+{
+    $digits = normalize_cpf($cpf ?? '');
+    return strlen($digits) === 11
+        ? substr($digits, 0, 3) . '.' . substr($digits, 3, 3) . '.' . substr($digits, 6, 3) . '-' . substr($digits, 9, 2)
+        : ($cpf ?? '');
+}
+
+function format_phone(?string $phone): string
+{
+    $digits = preg_replace('/\D+/', '', $phone ?? '') ?? '';
+    if (strlen($digits) === 11) {
+        return '(' . substr($digits, 0, 2) . ') ' . substr($digits, 2, 5) . '-' . substr($digits, 7, 4);
+    }
+    if (strlen($digits) === 10) {
+        return '(' . substr($digits, 0, 2) . ') ' . substr($digits, 2, 4) . '-' . substr($digits, 6, 4);
+    }
+    return $phone ?? '';
+}
+
 $flash = get_flash();
 $edit = null;
 $search = trim($_GET['busca'] ?? '');
@@ -197,8 +217,8 @@ if ($pdo) {
 </section>
 <section class="quick-actions"><div><p class="eyebrow">ACESSO RÁPIDO</p><h2>O que você deseja fazer?</h2></div><div class="action-grid"><a class="action-card" href="<?= e(page_url('clientes')) ?>"><span>＋</span><strong>Novo cliente</strong><small>Cadastre um cliente</small></a><a class="action-card" href="<?= e(page_url('equipamentos')) ?>"><span>▣</span><strong>Novo equipamento</strong><small>Registre um aparelho</small></a><a class="action-card" href="<?= e(page_url('ordens')) ?>"><span>↗</span><strong>Abrir ordem</strong><small>Inicie um atendimento</small></a></div></section>
 <?php elseif ($page === 'clientes'): ?>
-<section class="card"><h2><?= $edit ? 'Editar cliente' : 'Novo cliente' ?></h2><form method="post"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="cliente_salvar"><input type="hidden" name="id_cliente" value="<?= e($edit['id_cliente'] ?? '') ?>"><div class="grid"><label>Nome *<input name="nome" maxlength="100" required value="<?= e($edit['nome'] ?? '') ?>"></label><label>CPF *<input name="cpf" maxlength="14" required placeholder="Somente números" value="<?= e($edit['cpf'] ?? '') ?>"></label><label>Telefone *<input name="telefone" maxlength="20" required value="<?= e($edit['telefone'] ?? '') ?>"></label><label>E-mail<input type="email" name="email" maxlength="150" value="<?= e($edit['email'] ?? '') ?>"></label></div><button>Salvar</button><?php if ($edit): ?> <a class="button secondary" href="<?= e(page_url('clientes')) ?>">Cancelar</a><?php endif; ?></form></section>
-<section class="card"><div class="title-row"><h2>Clientes cadastrados</h2><form class="inline"><input type="hidden" name="pagina" value="clientes"><input name="busca" placeholder="Nome ou CPF" value="<?= e($search) ?>"><button>Pesquisar</button></form></div><?php if (!$clientes): ?><p class="empty">Nenhum cliente encontrado.</p><?php else: ?><table><tr><th>ID</th><th>Nome</th><th>CPF</th><th>Telefone</th><th>Ações</th></tr><?php foreach ($clientes as $item): ?><tr><td><?= e((string) $item['id_cliente']) ?></td><td><?= e($item['nome']) ?></td><td><?= e($item['cpf']) ?></td><td><?= e($item['telefone']) ?></td><td><a href="<?= e(page_url('clientes', ['editar' => $item['id_cliente']])) ?>">Editar</a> <form class="inline" method="post" onsubmit="return confirm('Excluir este cliente?')"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="cliente_excluir"><input type="hidden" name="id_cliente" value="<?= e((string) $item['id_cliente']) ?>"><button class="link danger">Excluir</button></form></td></tr><?php endforeach; ?></table><?php endif; ?></section>
+<section class="card"><h2><?= $edit ? 'Editar cliente' : 'Novo cliente' ?></h2><form method="post"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="cliente_salvar"><input type="hidden" name="id_cliente" value="<?= e($edit['id_cliente'] ?? '') ?>"><div class="grid"><label>Nome *<input name="nome" maxlength="100" required value="<?= e($edit['nome'] ?? '') ?>"></label><label>CPF *<input name="cpf" class="cpf-mask" inputmode="numeric" maxlength="14" required placeholder="000.000.000-00" value="<?= e(format_cpf($edit['cpf'] ?? '')) ?>"></label><label>Telefone *<input name="telefone" class="phone-mask" inputmode="tel" maxlength="15" required placeholder="(00) 00000-0000" value="<?= e(format_phone($edit['telefone'] ?? '')) ?>"></label><label>E-mail<input type="email" name="email" maxlength="150" value="<?= e($edit['email'] ?? '') ?>"></label></div><button>Salvar</button><?php if ($edit): ?> <a class="button secondary" href="<?= e(page_url('clientes')) ?>">Cancelar</a><?php endif; ?></form></section>
+<section class="card"><div class="title-row"><h2>Clientes cadastrados</h2><form class="inline"><input type="hidden" name="pagina" value="clientes"><input name="busca" placeholder="Nome ou CPF" value="<?= e($search) ?>"><button>Pesquisar</button></form></div><?php if (!$clientes): ?><p class="empty">Nenhum cliente encontrado.</p><?php else: ?><table><tr><th>ID</th><th>Nome</th><th>CPF</th><th>Telefone</th><th>Ações</th></tr><?php foreach ($clientes as $item): ?><tr><td><?= e((string) $item['id_cliente']) ?></td><td><?= e($item['nome']) ?></td><td><?= e(format_cpf($item['cpf'])) ?></td><td><?= e(format_phone($item['telefone'])) ?></td><td><a href="<?= e(page_url('clientes', ['editar' => $item['id_cliente']])) ?>">Editar</a> <form class="inline" method="post" onsubmit="return confirm('Excluir este cliente?')"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="cliente_excluir"><input type="hidden" name="id_cliente" value="<?= e((string) $item['id_cliente']) ?>"><button class="link danger">Excluir</button></form></td></tr><?php endforeach; ?></table><?php endif; ?></section>
 <?php elseif ($page === 'equipamentos'): ?>
 <section class="card"><h2><?= $edit ? 'Editar equipamento' : 'Novo equipamento' ?></h2><form method="post"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="equipamento_salvar"><input type="hidden" name="id_equipamento" value="<?= e($edit['id_equipamento'] ?? '') ?>"><?php if ($edit): ?><input type="hidden" name="id_cliente" value="<?= e($edit['id_cliente']) ?>"><?php endif; ?><div class="grid"><label>Proprietário *<?php if ($edit): ?><input disabled value="<?= e(fetch_one($pdo, 'SELECT nome FROM clientes WHERE id_cliente=?', [$edit['id_cliente']])['nome'] ?? '') ?>"><?php else: ?><select name="id_cliente" required><option value="">Selecione</option><?php foreach ($clientes as $c): ?><option value="<?= e((string) $c['id_cliente']) ?>"><?= e($c['nome']) ?></option><?php endforeach; ?></select><?php endif; ?></label><label>Tipo *<select name="tipo" required><?php foreach (EQUIPMENT_TYPES as $type): ?><option <?= ($edit['tipo'] ?? '') === $type ? 'selected' : '' ?>><?= e($type) ?></option><?php endforeach; ?></select></label><label>Marca *<input name="marca" maxlength="50" required value="<?= e($edit['marca'] ?? '') ?>"></label><label>Modelo *<input name="modelo" maxlength="100" required value="<?= e($edit['modelo'] ?? '') ?>"></label><label>Número de série<input name="numero_serie" maxlength="100" value="<?= e($edit['numero_serie'] ?? '') ?>"></label></div><button>Salvar</button></form></section>
 <section class="card"><h2>Equipamentos cadastrados</h2><?php if (!$equipamentos): ?><p class="empty">Nenhum equipamento cadastrado.</p><?php else: ?><table><tr><th>ID</th><th>Proprietário</th><th>Tipo</th><th>Marca/modelo</th><th>Ações</th></tr><?php foreach ($equipamentos as $item): ?><tr><td><?= e((string) $item['id_equipamento']) ?></td><td><?= e($item['cliente_nome']) ?></td><td><?= e($item['tipo']) ?></td><td><?= e($item['marca'] . ' ' . $item['modelo']) ?></td><td><a href="<?= e(page_url('equipamentos', ['editar' => $item['id_equipamento']])) ?>">Editar</a> <form class="inline" method="post" onsubmit="return confirm('Excluir este equipamento?')"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="equipamento_excluir"><input type="hidden" name="id_equipamento" value="<?= e((string) $item['id_equipamento']) ?>"><button class="link danger">Excluir</button></form></td></tr><?php endforeach; ?></table><?php endif; ?></section>
@@ -212,4 +232,28 @@ if ($pdo) {
 <section class="card"><h2>Ordem #<?= e((string) $ordem['id_ordem']) ?></h2><p><strong>Cliente:</strong> <?= e($ordem['cliente_nome']) ?> · <strong>Equipamento:</strong> <?= e($ordem['tipo'] . ' ' . $ordem['marca'] . ' ' . $ordem['modelo']) ?> · <strong>Técnico:</strong> <?= e($ordem['tecnico_nome']) ?></p><p><strong>Entrada:</strong> <?= e(format_date_br($ordem['data_entrada'])) ?> · <strong>Conclusão:</strong> <?= e(format_date_br($ordem['data_conclusao'])) ?></p><p><strong>Defeito relatado:</strong><br><?= nl2br(e($ordem['defeito_relatado'])) ?></p><form method="post"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="ordem_atualizar"><input type="hidden" name="id_ordem" value="<?= e((string) $ordem['id_ordem']) ?>"><label>Diagnóstico<textarea name="diagnostico"><?= e($ordem['diagnostico']) ?></textarea></label><label>Status<select name="status"><?php foreach (STATUS_OPTIONS as $status): ?><option <?= $ordem['status'] === $status ? 'selected' : '' ?>><?= e($status) ?></option><?php endforeach; ?></select></label><button>Atualizar ordem</button></form></section>
 <section class="card"><h2>Histórico deste equipamento</h2><table><tr><th>Ordem</th><th>Entrada</th><th>Conclusão</th><th>Status</th><th>Defeito</th></tr><?php foreach ($historico as $item): ?><tr><td><a href="<?= e(page_url('ordem', ['id' => $item['id_ordem']])) ?>">#<?= e((string) $item['id_ordem']) ?></a></td><td><?= e(format_date_br($item['data_entrada'])) ?></td><td><?= e(format_date_br($item['data_conclusao'])) ?></td><td><?= e($item['status']) ?></td><td><?= e($item['defeito_relatado']) ?></td></tr><?php endforeach; ?></table></section>
 <?php endif; ?>
-</main><footer><div class="container">Projeto acadêmico de Banco de Dados · PostgreSQL + PHP PDO</div></footer></body></html>
+</main><footer><div class="container">Projeto acadêmico de Banco de Dados · PostgreSQL + PHP PDO</div></footer><script>
+function digits(value) {
+    return value.replace(/\D/g, '');
+}
+
+function formatCpf(value) {
+    const numbers = digits(value).slice(0, 11);
+    return numbers.replace(/^(\d{3})(\d)/, '$1.$2').replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3').replace(/\.(\d{3})(\d{1,2})$/, '.$1-$2');
+}
+
+function formatPhone(value) {
+    const numbers = digits(value).slice(0, 11);
+    if (numbers.length <= 10) {
+        return numbers.replace(/^(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d{1,4})$/, '$1-$2');
+    }
+    return numbers.replace(/^(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d{1,4})$/, '$1-$2');
+}
+
+document.querySelectorAll('.cpf-mask').forEach((input) => {
+    input.addEventListener('input', () => { input.value = formatCpf(input.value); });
+});
+document.querySelectorAll('.phone-mask').forEach((input) => {
+    input.addEventListener('input', () => { input.value = formatPhone(input.value); });
+});
+</script></body></html>
