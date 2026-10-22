@@ -1,5 +1,3 @@
-USE assistencia_tecnica;
-
 -- 1. Equipamentos de um cliente.
 SELECT e.*
 FROM equipamentos e

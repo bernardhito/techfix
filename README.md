@@ -1,23 +1,25 @@
 # Sistema de assistência técnica
 
-Projeto acadêmico simples para demonstrar cadastros, relacionamentos e consultas usando PHP, PDO e MySQL. Todos os dados do exemplo são fictícios.
+Projeto acadêmico simples para demonstrar cadastros, relacionamentos e consultas usando PHP, PDO e PostgreSQL. Todos os dados do exemplo são fictícios.
 
 ## Requisitos
 
-- XAMPP (Apache, PHP 8.1+ e MySQL/MariaDB).
-- Extensão `pdo_mysql` habilitada no PHP.
+- Apache, PHP 8.1+ e PostgreSQL 14+.
+- Extensão `pdo_pgsql` habilitada no PHP.
 - Navegador moderno.
 
 ## Configuração e execução
 
-1. Copie a pasta do projeto para `C:\xampp\htdocs\assistencia-tecnica`.
-2. Inicie Apache e MySQL no XAMPP.
-3. No phpMyAdmin ou no cliente MySQL, execute `sql/schema.sql`.
-4. Opcionalmente execute `sql/seed.sql` para inserir dados fictícios.
-5. Se necessário, ajuste usuário, senha e host em `config/database.php` (o padrão é usuário `root` sem senha).
-6. Acesse `http://localhost/assistencia-tecnica/public/`.
+1. Copie a pasta do projeto para `C:\xampp\htdocs\assistencia-tecnica` (o XAMPP será usado apenas para o Apache).
+2. Instale e inicie o serviço do PostgreSQL.
+3. Crie um banco chamado `assistencia_tecnica` no pgAdmin ou com `createdb -U postgres assistencia_tecnica`.
+4. Conectado ao banco, execute `sql/schema.sql` com o pgAdmin ou `psql -U postgres -d assistencia_tecnica -f sql/schema.sql`.
+5. Opcionalmente execute `sql/seed.sql` para inserir dados fictícios.
+6. Ajuste host, porta, usuário e senha em `config/database.php` (o padrão usa usuário `postgres`, porta `5432` e senha vazia).
+7. Se o PHP do XAMPP não tiver o driver, habilite `extension=pdo_pgsql` no `php.ini` e reinicie o Apache.
+8. Acesse `http://localhost/assistencia-tecnica/public/`.
 
-As operações de alteração usam POST e token CSRF. A aplicação usa prepared statements, validação no servidor, escape HTML e chaves estrangeiras InnoDB com `RESTRICT`, preservando históricos.
+As operações de alteração usam POST e token CSRF. A aplicação usa prepared statements, validação no servidor, escape HTML e chaves estrangeiras PostgreSQL com `RESTRICT`, preservando históricos.
 
 ## Fluxo para apresentação
 
@@ -38,4 +40,4 @@ As operações de alteração usam POST e token CSRF. A aplicação usa prepared
 
 ## Validação
 
-O fluxo depende de um servidor PHP e de um MySQL em execução. Neste ambiente de geração não há Apache/MySQL disponível para executar o fluxo com persistência; a validação possível é a inspeção do código e a conferência de consistência entre os nomes usados no PHP, SQL e diagrama. Em um ambiente local, teste também CPF duplicado, exclusões com dependências e reabertura de ordens.
+O fluxo depende de um servidor PHP e de um PostgreSQL em execução. Em um ambiente local, teste também CPF duplicado, exclusões com dependências e reabertura de ordens.
