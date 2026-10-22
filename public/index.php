@@ -187,7 +187,7 @@ if ($pdo) {
         $edit = isset($_GET['editar']) ? fetch_one($pdo, 'SELECT * FROM tecnicos WHERE id_tecnico=?', [(int) $_GET['editar']]) : null;
         $tecnicos = fetch_all($pdo, 'SELECT * FROM tecnicos ORDER BY nome');
     } elseif ($page === 'ordens') {
-        $ordens = fetch_all($pdo, 'SELECT o.*, e.tipo, e.marca, e.modelo, c.nome AS cliente_nome, t.nome AS tecnico_nome FROM ordens_servico o JOIN equipamentos e ON e.id_equipamento=o.id_equipamento JOIN clientes c ON c.id_cliente=e.id_cliente JOIN tecnicos t ON t.id_tecnico=o.id_tecnico WHERE (? = "" OR o.status = ?) ORDER BY o.id_ordem DESC', [$status_filter, $status_filter]);
+        $ordens = fetch_all($pdo, "SELECT o.*, e.tipo, e.marca, e.modelo, c.nome AS cliente_nome, t.nome AS tecnico_nome FROM ordens_servico o JOIN equipamentos e ON e.id_equipamento=o.id_equipamento JOIN clientes c ON c.id_cliente=e.id_cliente JOIN tecnicos t ON t.id_tecnico=o.id_tecnico WHERE (? = '' OR o.status = ?) ORDER BY o.id_ordem DESC", [$status_filter, $status_filter]);
         $equipamentos = fetch_all($pdo, 'SELECT e.id_equipamento, e.tipo, e.marca, e.modelo, c.nome AS cliente_nome FROM equipamentos e JOIN clientes c ON c.id_cliente=e.id_cliente ORDER BY c.nome, e.marca');
         $tecnicos = fetch_all($pdo, 'SELECT * FROM tecnicos ORDER BY nome');
     } elseif ($page === 'ordem' && isset($_GET['id'])) {
