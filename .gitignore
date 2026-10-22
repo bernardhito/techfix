@@ -1,0 +1,10 @@
+# Arquivos locais do ambiente
+.env
+.env.*
+*.log
+
+# Configurações e arquivos temporários de editores
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
