@@ -1,4 +1,3 @@
-USE assistencia_tecnica;
 INSERT INTO clientes (nome, cpf, telefone, email) VALUES
 ('Ana Souza', '12345678901', '(11) 99999-1111', 'ana.exemplo@email.test'),
 ('Bruno Lima', '98765432100', '(11) 98888-2222', NULL);

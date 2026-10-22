@@ -29,8 +29,8 @@ erDiagram
         INT id_ordem PK
         INT id_equipamento FK
         INT id_tecnico FK
-        DATETIME data_entrada
-        DATETIME data_conclusao
+        TIMESTAMP data_entrada
+        TIMESTAMP data_conclusao
         TEXT defeito_relatado
         TEXT diagnostico
         VARCHAR status
