@@ -15,7 +15,7 @@ Projeto acadêmico simples para demonstrar cadastros, relacionamentos e consulta
 3. Crie um banco chamado `assistencia_tecnica` no pgAdmin ou com `createdb -U postgres assistencia_tecnica`.
 4. Conectado ao banco, execute `sql/schema.sql` com o pgAdmin ou `psql -U postgres -d assistencia_tecnica -f sql/schema.sql`.
 5. Opcionalmente execute `sql/seed.sql` para inserir dados fictícios.
-6. Ajuste host, porta, usuário e senha em `config/database.php` (o padrão usa usuário `postgres`, porta `5432` e senha vazia).
+6. Configure a senha pela variável de ambiente `TECHFIX_DB_PASS` ou ajuste a conexão em `config/database.php` (o padrão usa usuário `postgres` e porta `5432`).
 7. Se o PHP do XAMPP não tiver o driver, habilite `extension=pdo_pgsql` no `php.ini` e reinicie o Apache.
 8. Acesse `http://localhost/assistencia-tecnica/public/`.
 
