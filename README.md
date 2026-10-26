@@ -1,4 +1,4 @@
-# Sistema de assistência técnica
+# TechFix — Sistema de assistência técnica
 
 Projeto acadêmico simples para demonstrar cadastros, relacionamentos e consultas usando PHP, PDO e PostgreSQL. Todos os dados do exemplo são fictícios.
 
@@ -34,7 +34,7 @@ As operações de alteração usam POST e token CSRF. A aplicação usa prepared
 
 ## Consultas e diagrama
 
-- Consultas comentadas: `sql/consultas.sql`.
+- Consultas de exemplo: `sql/consultas.sql`.
 - Dados fictícios: `sql/seed.sql`.
 - Diagrama Mermaid consistente com o esquema: `docs/diagrama.md`.
 
